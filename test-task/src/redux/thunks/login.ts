@@ -9,7 +9,7 @@ const login = (
   email: string,
   password: string,
   setSubmitting: (isSubmitting: boolean) => void,
-): any => (dispatch: any) => {
+): ThunkAction<void, StateType, unknown, ActionsType> => dispatch => {
   authApi
     .login(clientId, email, password)
     .then(response => {
@@ -18,8 +18,6 @@ const login = (
       dispatch(setErrors(false, null));
     })
     .catch(err => {
-      debugger;
-
       dispatch(setErrors(true, err.response.data.message));
       setSubmitting(false);
     });

@@ -20,15 +20,6 @@ export const authApi = {
       password,
     });
   },
-  // login(clientId: number | null, email: string, password: string) {
-  //   return fetch(`https://tager.dev.ozitag.com/api/auth/user`, {
-  //     method: 'POST',
-  //     body: JSON.stringify({ clientId, email, password }),
-  //     headers: {
-  //       'Content-Type': 'application/json',
-  //     },
-  //   });
-  // },
   logout(accessToken: string | null) {
     return instance.post<LogoutType>(
       '/tager/user/profile/logout',
