@@ -21,9 +21,10 @@ const StyledFormik = styled.div`
     height: 50vh;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
+    justify-content: space-evenly;
     background: white;
     border-radius: 5px;
   }
 `;
+
 export default StyledFormik;

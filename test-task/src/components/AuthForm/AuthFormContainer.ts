@@ -7,6 +7,8 @@ import { StateType } from '../../redux/store/store';
 const mapStateToProps = (state: StateType) => {
   return {
     accessToken: authSelector(state).accessToken,
+    isError: authSelector(state).isError,
+    errorMessage: authSelector(state).errorMessage,
     isAuth: authSelector(state).isAuth,
   };
 };

@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FC, useCallback } from 'react';
 import { Redirect } from 'react-router-dom';
 
 import { Button, Avatar } from '@material-ui/core';
@@ -20,6 +20,13 @@ type PropsType = {
 const Profile: FC<PropsType> = ({ name, email, isAuth, accessToken, logout }) => {
   const classes = useStyles();
 
+  const onClick = useCallback(
+    (accessToken: string | null) => {
+      logout(accessToken);
+    },
+    [logout],
+  );
+
   return !isAuth ? (
     <Redirect to="/login" />
   ) : (
@@ -33,7 +40,7 @@ const Profile: FC<PropsType> = ({ name, email, isAuth, accessToken, logout }) =>
         <StyledProfileContent>
           <StyledField>{name}</StyledField>
           <StyledField>{email}</StyledField>
-          <Button className={classes.button} variant="contained" color="primary" onClick={() => logout(accessToken)}>
+          <Button className={classes.button} variant="contained" color="primary" onClick={() => onClick(accessToken)}>
             logout
           </Button>
         </StyledProfileContent>

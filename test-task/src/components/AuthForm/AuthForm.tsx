@@ -1,6 +1,6 @@
-import React, { FC } from 'react';
+import React, { FC, useCallback } from 'react';
 
-import { Formik, Form, Field } from 'formik';
+import { Formik, Form, Field, FormikHelpers } from 'formik';
 import { Button, LinearProgress } from '@material-ui/core';
 import { TextField } from 'formik-material-ui';
 
@@ -10,6 +10,7 @@ import * as Yup from 'yup';
 
 import StyledFormik from './AuthFormStyles/StyledFormik';
 import StyledHeader from './AuthFormStyles/StyledHeader';
+import StyledErrorMessage from './AuthFormStyles/StyledErrorMessage';
 
 type ValuesType = {
   clientId: number | null;
@@ -19,10 +20,17 @@ type ValuesType = {
 type PropsType = {
   accessToken: string | null;
   isAuth: boolean;
-  login: (clientId: number | null, email: string, password: string) => void;
+  isError: boolean;
+  errorMessage: string | null;
+  login: (
+    clientId: number | null,
+    email: string,
+    password: string,
+    setSubmitting: (isSubmitting: boolean) => void,
+  ) => void;
 };
 
-const AuthForm: FC<PropsType> = ({ isAuth, login }) => {
+const AuthForm: FC<PropsType> = ({ isAuth, login, isError, errorMessage }) => {
   const initialValues: ValuesType = {
     email: '',
     password: '',
@@ -31,13 +39,20 @@ const AuthForm: FC<PropsType> = ({ isAuth, login }) => {
 
   const validationSchema = Yup.object({
     email: Yup.string().email('Invalid email format').required('Required'),
-    password: Yup.string().required('Required'),
+    password: Yup.string()
+      .required('Required')
+      .min(4, 'Password is too short')
+      .matches(/[a-zA-Z]/, 'Password can only contain Latin letters.'),
   });
 
-  const onSubmit = ({ clientId, email, password }: ValuesType) => {
-    if (!clientId) clientId = 1;
-    login(clientId, email, password);
-  };
+  const onSubmit = useCallback(
+    ({ clientId, email, password }: ValuesType, { setSubmitting }: FormikHelpers<ValuesType>) => {
+      clientId = clientId ?? 1;
+      setSubmitting(true);
+      login(clientId, email, password, setSubmitting);
+    },
+    [login],
+  );
 
   return isAuth ? (
     <Redirect to="/profile" />
@@ -45,15 +60,14 @@ const AuthForm: FC<PropsType> = ({ isAuth, login }) => {
     <>
       <StyledFormik>
         <Formik initialValues={initialValues} validationSchema={validationSchema} onSubmit={onSubmit}>
-          {({ submitForm, isSubmitting }) => (
+          {({ isSubmitting }) => (
             <Form>
               <StyledHeader>Login</StyledHeader>
               <Field component={TextField} name="email" type="email" label="Email" />
-              <br />
               <Field component={TextField} type="password" label="Password" name="password" />
               {isSubmitting && <LinearProgress />}
-              <br />
-              <Button variant="contained" color="primary" disabled={isSubmitting} onClick={submitForm}>
+              {isError && <StyledErrorMessage>{errorMessage}</StyledErrorMessage>}
+              <Button variant="contained" color="primary" type="submit" disabled={isSubmitting}>
                 Login
               </Button>
             </Form>
